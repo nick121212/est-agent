@@ -53,10 +53,10 @@ export default (config) => {
             }
 
             ctx.body = JSON.parse(res.text);
-            return await next();
+            await next();
+        } else {
+            throw boom.create(407, "读取配置文件错误！");
         }
-
-        throw boom.create(407, "读取配置文件错误！");
     });
 
     compose.use(async(ctx, next) => {
@@ -73,10 +73,10 @@ export default (config) => {
         await next();
     });
 
-    compose.use(async(ctx, next) => {
-        shelljs.exec("service salt-minion restart");
-        await next();
-    });
+    // compose.use(async(ctx, next) => {
+    //     // shelljs.exec("service salt-minion restart");
+    //     await next();
+    // });
 
     compose.use(async(ctx, next) => {
         if (shelljs.exec("service salt-minion restart").code != 0)
@@ -94,6 +94,8 @@ export default (config) => {
             }
             ctx.body = { result: true };
             await next();
+
+            shelljs.exec("service salt-minion restart");
         });
     };
 };
