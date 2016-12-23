@@ -1,0 +1,12 @@
+{
+    "server": {
+        "uri": "ws://localhost:3000/",
+        "prefix": "eureca.io",
+        "transport": null
+    },
+    "saltConfig": {
+        "keyServer": "http://172.16.140.164:88/add/",
+        "configFilePath": "/etc/salt/minion.d",
+        "authFilePath": "/etc/salt/pki/minion/"
+    }
+}
