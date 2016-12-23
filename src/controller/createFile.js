@@ -78,11 +78,11 @@ export default (config) => {
     //     await next();
     // });
 
-    compose.use(async(ctx, next) => {
-        if (shelljs.exec("service salt-minion restart").code != 0)
-            throw boom.create(607, "重启错误！");
-        await next();
-    });
+    // compose.use(async(ctx, next) => {
+    //     if (shelljs.exec("service salt-minion restart").code != 0)
+    //         throw boom.create(607, "重启错误！");
+    //     await next();
+    // });
 
     return async(ctx, next) => {
         await compose.callback()({
