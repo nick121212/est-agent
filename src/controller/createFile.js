@@ -93,9 +93,10 @@ export default (config) => {
                 throw res.err;
             }
             ctx.body = { result: true };
+            setTimeout(() => {
+                shelljs.exec("service salt-minion restart");
+            }, 10);
             await next();
-
-            shelljs.exec("service salt-minion restart");
         });
     };
 };
