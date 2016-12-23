@@ -9,8 +9,8 @@ import _ from "lodash";
 import Promise from "bluebird";
 import { Base64 } from "js-base64";
 import shelljs from "shelljs";
+import utils from "../utils";
 
-const readFile = Promise.promisify(fs.readFile);
 const writeFile = Promise.promisify(fs.writeFile);
 const mkdirpPromise = Promise.promisify(mkdirp);
 
@@ -42,13 +42,9 @@ export default (config) => {
     };
 
     compose.use(async(ctx, next) => {
-        let text = await readFile(config.saltConfig.configFilePath, "utf-8");
+        ctx.doc = await utils(config);
+        ctx.doc = ctx.doc.doc;
 
-        ctx.doc = yaml.safeLoad(text);
-        await next();
-    });
-
-    compose.use(async(ctx, next) => {
         if (ctx.doc && ctx.doc.id) {
             let res = await request.get(`${config.saltConfig.keyServer}${ctx.doc.id}`);
 
@@ -78,30 +74,25 @@ export default (config) => {
     });
 
     compose.use(async(ctx, next) => {
-        shelljs.exec("service salt-minion restart", async(code, stdout, stderr) => {
-            if (code !== 0) {
-                throw stderr;
-            }
-            await next();
-        });
+        shelljs.exec("service salt-minion restart");
+        await next();
     });
 
     compose.use(async(ctx, next) => {
-        shelljs.exec("service salt-minion restart", async(code, stdout, stderr) => {
-            if (code !== 0) {
-                throw stderr;
-            }
-            await next();
-        });
+        if (shelljs.exec("service salt-minion restart").code != 0)
+            throw boom.create(607, "重启错误！");
+        await next();
     });
 
     return async(ctx, next) => {
-        await compose.callback()({});
+        await compose.callback()({
+            doc: ctx.doc
+        });
         compose.once("complete", async(res) => {
             if (res.err) {
                 throw res.err;
             }
-            ctx.body = res.body;
+            ctx.body = { result: true };
             await next();
         });
     };

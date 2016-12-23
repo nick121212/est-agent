@@ -1,5 +1,6 @@
 import nspa from "nspa";
 import controller from "./controller";
+import utils from "./utils";
 // import statsd from "../node_modules/statsd/statsd";
 
 const config = nspa.configFile();
@@ -8,11 +9,11 @@ class Application extends nspa.Spa {
     constructor(_maxJobs) {
         super(_maxJobs);
     }
-    onComplete(ctx) {
+    async onComplete(ctx) {
         super.onComplete(ctx);
-        if (this.spaClient.proxy && this.spaClient.proxy.setStatus) {
-            this.spaClient.proxy.setStatus(10 - this.jobs);
-        }
+        // if (this.spaClient.proxy && this.spaClient.proxy.setStatus) {
+        //     this.spaClient.proxy.setStatus(await utils(config));
+        // }
     }
 }
 
@@ -20,8 +21,8 @@ const init = async() => {
     const app = new Application(10);
 
     app.initClient(config.server, {
-        ready: (spaClient, proxy) => {
-            proxy.setStatus(app.maxJobs - app.jobs);
+        ready: async(spaClient, proxy) => {
+            proxy.setStatus && proxy.setStatus(await utils(config));
         }
     });
 
