@@ -46,43 +46,18 @@ export default (config) => {
         ctx.doc = ctx.doc.doc;
 
         if (ctx.doc && ctx.doc.id) {
-            let res = await request.get(`${config.saltConfig.keyServer}/add/${ctx.doc.id}`);
+            let res = await request.get(`${config.saltConfig.keyServer}/del/${ctx.doc.id}`);
 
             if (res.statusCode !== 200) {
                 throw boom.create(res.statusCode, "返回码不正确");
             }
 
-            ctx.body = JSON.parse(res.text);
+            // ctx.body = JSON.parse(res.text);
             await next();
         } else {
             throw boom.create(407, "读取配置文件错误！");
         }
     });
-
-    compose.use(async(ctx, next) => {
-        ctx.body["minion.pem"] = Base64.decode(Base64.decode(ctx.body["minion.pem"]).replace(/SunYongFengxiao/gi, ""));
-        await mkdirpPromise(config.saltConfig.authFilePath);
-        await next();
-    });
-
-    compose.use(async(ctx, next) => {
-        _.forEach(files, async(val, key) => {
-            await writeFile(path.join(config.saltConfig.authFilePath || __dirname, key), ctx.body[key], val);
-        });
-
-        await next();
-    });
-
-    // compose.use(async(ctx, next) => {
-    //     // shelljs.exec("service salt-minion restart");
-    //     await next();
-    // });
-
-    // compose.use(async(ctx, next) => {
-    //     if (shelljs.exec("service salt-minion restart").code != 0)
-    //         throw boom.create(607, "重启错误！");
-    //     await next();
-    // });
 
     return async(ctx, next) => {
         await compose.callback()({
@@ -93,9 +68,7 @@ export default (config) => {
                 throw res.err;
             }
             ctx.body = { result: true };
-            setTimeout(() => {
-                shelljs.exec("service salt-minion restart");
-            }, 10);
+
             await next();
         });
     };

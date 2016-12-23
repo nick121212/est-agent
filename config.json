@@ -5,7 +5,7 @@
         "transport": null
     },
     "saltConfig": {
-        "keyServer": "http://172.16.140.164:88/add/",
+        "keyServer": "http://172.16.140.164:88",
         "configFilePath": "main.conf",
         "authFilePath": "/etc/salt/pki/minion/"
     }
