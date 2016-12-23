@@ -8,6 +8,7 @@ import mkdirp from "mkdirp";
 import _ from "lodash";
 import Promise from "bluebird";
 import { Base64 } from "js-base64";
+import shelljs from "shelljs";
 
 const readFile = Promise.promisify(fs.readFile);
 const writeFile = Promise.promisify(fs.writeFile);
@@ -74,6 +75,24 @@ export default (config) => {
         });
 
         await next();
+    });
+
+    compose.use(async(ctx, next) => {
+        shelljs.exec("service salt-minion restart", async(code, stdout, stderr) => {
+            if (code !== 0) {
+                throw stderr;
+            }
+            await next();
+        });
+    });
+
+    compose.use(async(ctx, next) => {
+        shelljs.exec("service salt-minion restart", async(code, stdout, stderr) => {
+            if (code !== 0) {
+                throw stderr;
+            }
+            await next();
+        });
     });
 
     return async(ctx, next) => {
