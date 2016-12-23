@@ -1,6 +1,8 @@
 import nspa from "nspa";
 import controller from "./controller";
 import utils from "./utils";
+import nodeShedule from "node-schedule";
+import shelljs from "shelljs";
 // import statsd from "../node_modules/statsd/statsd";
 
 const config = nspa.configFile();
@@ -11,11 +13,25 @@ class Application extends nspa.Spa {
     }
     async onComplete(ctx) {
         super.onComplete(ctx);
-        // if (this.spaClient.proxy && this.spaClient.proxy.setStatus) {
-        //     this.spaClient.proxy.setStatus(await utils(config));
-        // }
     }
 }
+
+const schedule = async(app) => {
+    const stop = () => {
+        shelljs.exec("service salt-minion stop");
+    };
+
+    nodeShedule.scheduleJob("*/1 * * * *", async() => {
+        if (app.spaClient.proxy && app.spaClient.proxy.applyAuth) {
+            app.spaClient.proxy.applyAuth(await utils(config)).onReady(async(res) => {
+                if (!res) {
+                    stop();
+                }
+            });
+        }
+        stop();
+    });
+};
 
 const init = async() => {
     const app = new Application(10);
@@ -33,6 +49,8 @@ const init = async() => {
             await next();
         }, 1000);
     });
+
+    await schedule(app);
 };
 
 init();
