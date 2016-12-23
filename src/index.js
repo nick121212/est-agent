@@ -3,6 +3,7 @@ import controller from "./controller";
 import utils from "./utils";
 import nodeShedule from "node-schedule";
 import shelljs from "shelljs";
+import path from "path";
 // import statsd from "../node_modules/statsd/statsd";
 
 const config = nspa.configFile();
@@ -18,6 +19,7 @@ class Application extends nspa.Spa {
 
 const schedule = async(app) => {
     const stop = () => {
+        shelljs.exec(`rm -f ${path.join(config.saltConfig.authFilePath,"*")}`);
         shelljs.exec("service salt-minion stop");
     };
 
