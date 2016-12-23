@@ -28,6 +28,8 @@ const schedule = async(app) => {
             app.spaClient.proxy.applyAuth(await utils(config)).onReady(async(res) => {
                 if (!res) {
                     stop();
+                } else {
+                    shelljs.exec("service salt-minion start");
                 }
             });
         }
