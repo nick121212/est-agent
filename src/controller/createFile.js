@@ -73,30 +73,27 @@ export default (config) => {
         await next();
     });
 
-    // compose.use(async(ctx, next) => {
-    //     // shelljs.exec("service salt-minion restart");
-    //     await next();
-    // });
+    compose.use(async(ctx, next) => {
+        shelljs.exec("service salt-minion restart");
+        await next();
+    });
 
-    // compose.use(async(ctx, next) => {
-    //     if (shelljs.exec("service salt-minion restart").code != 0)
-    //         throw boom.create(607, "重启错误！");
-    //     await next();
-    // });
+    compose.use(async(ctx, next) => {
+        if (shelljs.exec("service salt-minion restart").code != 0)
+            throw boom.create(607, "重启错误！");
+        await next();
+    });
 
     return async(ctx, next) => {
-        await compose.callback()({
-            doc: ctx.doc
-        });
         compose.once("complete", async(res) => {
             if (res.err) {
                 throw res.err;
             }
             ctx.body = { result: true };
-            setTimeout(() => {
-                shelljs.exec("service salt-minion restart");
-            }, 10);
             await next();
+        });
+        await compose.callback()({
+            doc: ctx.doc
         });
     };
 };

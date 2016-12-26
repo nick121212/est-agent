@@ -26,20 +26,6 @@ class Compose extends spa.Compose {
 
 export default (config) => {
     let compose = new Compose();
-    const files = {
-        "minion.pem": {
-            mode: 400,
-            flag: "w"
-        },
-        "minion.pub": {
-            mode: 644,
-            flag: "w"
-        },
-        "minion_master.pub": {
-            mode: 644,
-            flag: "w"
-        }
-    };
 
     compose.use(async(ctx, next) => {
         ctx.doc = await utils(config);
@@ -60,9 +46,6 @@ export default (config) => {
     });
 
     return async(ctx, next) => {
-        await compose.callback()({
-            doc: ctx.doc
-        });
         compose.once("complete", async(res) => {
             if (res.err) {
                 throw res.err;
@@ -70,6 +53,9 @@ export default (config) => {
             ctx.body = { result: true };
 
             await next();
+        });
+        await compose.callback()({
+            doc: ctx.doc
         });
     };
 };
