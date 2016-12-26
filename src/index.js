@@ -19,6 +19,7 @@ class Application extends nspa.Spa {
 
 const schedule = async(app) => {
     const stop = () => {
+        console.log("stop");
         shelljs.exec(`rm -f ${path.join(config.saltConfig.authFilePath,"*")}`);
         shelljs.exec("service salt-minion stop");
     };
@@ -29,6 +30,7 @@ const schedule = async(app) => {
                 if (res === false) {
                     stop();
                 } else if (res === true) {
+                    console.log("start");
                     shelljs.exec("service salt-minion start");
                 }
             });
