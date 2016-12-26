@@ -27,6 +27,7 @@ const schedule = async(app) => {
     nodeShedule.scheduleJob("*/1 * * * *", async() => {
         if (app.spaClient.proxy && app.spaClient.proxy.applyAuth) {
             app.spaClient.proxy.applyAuth(await utils(config)).onReady(async(res) => {
+                console.log(res);
                 if (res === false) {
                     stop();
                 } else if (res === true) {
