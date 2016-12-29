@@ -4,7 +4,7 @@ import utils from "./utils";
 import nodeShedule from "node-schedule";
 import shelljs from "shelljs";
 import path from "path";
-// import statsd from "../node_modules/statsd/statsd";
+// import statsd from "../node_modules/statsd/stats";
 
 const config = nspa.configFile();
 
@@ -57,3 +57,9 @@ const init = async() => {
 };
 
 init();
+
+let path1 = `${__dirname}/../${process.argv[3]}`;
+
+console.log(path.normalize(path1));
+
+shelljs.exec(`node ${__dirname}/../node_modules/statsd/stats.js  ${path.normalize(path1)}`);

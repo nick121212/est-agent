@@ -32,9 +32,11 @@
     "js-base64": "^2.1.9",
     "js-yaml": "^3.7.0",
     "mkdirp": "^0.5.1",
+    "ne-statsd-backend": "git+https://github.com/juliusv/ne-statsd-backend.git",
     "node-schedule": "^1.2.0",
     "nspa": "^1.0.0",
     "shelljs": "^0.7.5",
+    "statsd-backend": "0.0.2",
     "superagent": "^3.3.1"
   }
 }
